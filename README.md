@@ -81,9 +81,9 @@ Plugin 'scrooloose/vim-colon-therapy'
 Edit a filename with a trailing colon and line number. One of these forms:
 
 ```
-[file]:[line num]               => edits [file], jumps to [line num]
-[file]:[line num]:[other junk]  => edits [file], jumps to [line num], ignores [other junk]
-[file]:                         => edits [file], ignores colon
+:e [file]:[line num]               => edits [file], jumps to [line num]
+:e [file]:[line num]:[other junk]  => edits [file], jumps to [line num], ignores [other junk]
+:e [file]:                         => edits [file], ignores colon
 ```
 
 These are the forms I encounter regularly, but there may be more.
