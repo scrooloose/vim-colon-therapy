@@ -3,14 +3,6 @@ if exists('g:loaded_colon_therapy')
 endif
 let g:loaded_colon_therapy = 1
 
-"when copying/pasting from the term into :e from a git diff or rspec or
-"similar we edit things like
-"
-"./app/models/foo.rb:10:in
-"
-"Save the time of stripping trailing shit and just make this edit and go to
-"line 10.
-
 autocmd bufenter * call s:checkForLnum()
 autocmd bufenter * call s:checkForTrailingColon()
 
