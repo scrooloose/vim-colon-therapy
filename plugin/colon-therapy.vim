@@ -12,35 +12,45 @@ if exists('g:loaded_colon_therapy')
 endif
 let g:loaded_colon_therapy = 1
 
-autocmd bufenter * call s:checkForLnum()
-autocmd bufenter * call s:checkForTrailingColon()
+autocmd bufenter * call s:handleColons()
 
-" Handle filenames ending in a colon and line number
-function! s:checkForLnum() abort
-    let fname = expand("%:f")
-    if fname !~ ':\d\+\(:.\+\)\?$'
+" entry point function
+function! s:handleColons()
+    if !empty(&buftype)
         return
     endif
 
-    let lnum = substitute(fname, '^.*:\(\d\+\)\(:.*\)\?$', '\1', '')
-    let realFname = substitute(fname, '^\(.*\):\d\+\(:.*\)\?$', '\1', '')
+    let fname = expand("%:f")
+    call s:handleTrailingLineSpec(fname)
+    call s:handleTrailingColon(fname)
+endfunction
+
+" Handle filenames ending in a colon and line number
+function! s:handleTrailingLineSpec(fname) abort
+    if a:fname !~ ':\d\+\(:.\+\)\?$'
+        return
+    endif
+
+    let lnum = substitute(a:fname, '^.*:\(\d\+\)\(:.*\)\?$', '\1', '')
+    let realFname = substitute(a:fname, '^\(.*\):\d\+\(:.*\)\?$', '\1', '')
     exec "edit " . realFname
-    call s:doPostFnameCorrectionActions(fname)
+    call s:doPostFnameCorrectionActions(a:fname)
     call cursor(lnum, 1)
     normal! zz
 endfunction
 
 " Handle filenames ending in a colon (just ignore the colon)
-function! s:checkForTrailingColon() abort
-    let fname = expand("%:f")
-    if fname !~ ':$'
+function! s:handleTrailingColon(fname) abort
+    if a:fname !~ ':$'
         return
     endif
 
-    exec "edit " . substitute(fname, ':$', '', '')
-    call s:doPostFnameCorrectionActions(fname)
+    exec "edit " . substitute(a:fname, ':$', '', '')
+    call s:doPostFnameCorrectionActions(a:fname)
 endfunction
 
+" After doing some colon therapy, do some cleanup and continue loading the
+" buffer as normal
 function! s:doPostFnameCorrectionActions(oldFname)
     if bufnr(a:oldFname) != -1
         exec "bdelete " . bufnr(a:oldFname)
