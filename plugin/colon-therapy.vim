@@ -21,7 +21,10 @@ function! s:handleColons()
     endif
 
     let fname = expand("%:f")
-    call s:handleTrailingLineSpec(fname)
+
+    if s:handleTrailingLineSpec(fname) == 1
+        return
+    endif
     call s:handleTrailingColon(fname)
 endfunction
 
@@ -31,12 +34,14 @@ function! s:handleTrailingLineSpec(fname) abort
         return
     endif
 
-    let lnum = substitute(a:fname, '^.*:\(\d\+\)\(:.*\)\?$', '\1', '')
-    let realFname = substitute(a:fname, '^\(.*\):\d\+\(:.*\)\?$', '\1', '')
+    let lnum = substitute(a:fname, '^.\{-}:\(\d\+\)\(:.*\)\?$', '\1', '')
+    let realFname = substitute(a:fname, '^\(.\{-}\):\d\+\(:.*\)\?$', '\1', '')
     exec "edit " . realFname
     call s:doPostFnameCorrectionActions(a:fname)
     call cursor(lnum, 1)
     normal! zz
+
+    return 1
 endfunction
 
 " Handle filenames ending in a colon (just ignore the colon)
