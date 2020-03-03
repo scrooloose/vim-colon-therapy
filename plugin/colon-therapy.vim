@@ -12,6 +12,8 @@ if exists('g:loaded_colon_therapy')
 endif
 let g:loaded_colon_therapy = 1
 
+let s:debug_mode = 0
+
 autocmd bufenter * call s:handleColons()
 
 " entry point function
@@ -30,18 +32,39 @@ endfunction
 
 " Handle filenames ending in a colon and line number
 function! s:handleTrailingLineSpec(fname) abort
-    if a:fname !~ ':\d\+\(:.\+\)\?$'
+    call s:debug("shouldMungeFileName: " . s:shouldMungeFileName(a:fname))
+
+    if !s:shouldMungeFileName(a:fname)
         return
     endif
 
-    let lnum = substitute(a:fname, '^.\{-}:\(\d\+\)\(:.*\)\?$', '\1', '')
-    let realFname = substitute(a:fname, '^\(.\{-}\):\d\+\(:.*\)\?$', '\1', '')
-    exec "edit " . realFname
+    let editInfo = s:editInfoFor(a:fname)
+
+    call s:debug(editInfo)
+
+    exec "edit " . editInfo['fname']
     call s:doPostFnameCorrectionActions(a:fname)
-    call cursor(lnum, 1)
+    call cursor(editInfo['lnum'], 1)
     normal! zz
 
     return 1
+endfunction
+
+function s:debug(msg)
+    if s:debug_mode
+        echo "Colon Therapy: " . string(a:msg)
+    endif
+endfunction
+
+function! s:shouldMungeFileName(fname)
+    return a:fname =~ ':\d\+\(:.*\)\?$'
+endfunction
+
+function! s:editInfoFor(fname)
+    let lnum = substitute(a:fname, '^.\{-}:\(\d\+\)\(:.*\)\?$', '\1', '')
+    let realFname = substitute(a:fname, '^\(.\{-}\):\d\+\(:.*\)\?$', '\1', '')
+
+    return { 'lnum': lnum, 'fname': realFname }
 endfunction
 
 " Handle filenames ending in a colon (just ignore the colon)
@@ -63,4 +86,32 @@ function! s:doPostFnameCorrectionActions(oldFname)
 
     silent doautocmd bufread
     silent doautocmd bufreadpre
+endfunction
+
+" =================
+" Tests Below... should use a framework... but this will do for now
+
+function! s:assertEql(this, that)
+    if a:this != a:that
+        throw "Not equal: " . a:this . " " . a:that
+    endif
+endfunction
+
+function! TestColonTherapyShouldMungeFileName() abort
+    call s:assertEql(0, s:shouldMungeFileName('/a/b/c/foo.vim'))
+    call s:assertEql(1, s:shouldMungeFileName('/a/b/c/foo.vim:20'))
+    call s:assertEql(1, s:shouldMungeFileName('/a/b/c/foo.vim:20:'))
+    call s:assertEql(1, s:shouldMungeFileName('/a/b/c/foo.vim:20:bar'))
+endfunction
+
+function! TestColonTherapyEditInfoFor() abort
+    call s:assertEql('/a/b/c/foo.vim', s:editInfoFor('/a/b/c/foo.vim:20')['fname'])
+    call s:assertEql('/a/b/c/foo.vim', s:editInfoFor('/a/b/c/foo.vim:20:')['fname'])
+    call s:assertEql('/a/b/c/foo.vim', s:editInfoFor('/a/b/c/foo.vim:20:bar')['fname'])
+
+    call s:assertEql(0, s:editInfoFor('/a/b/c/foo.vim')['lnum'])
+    call s:assertEql(20, s:editInfoFor('/a/b/c/foo.vim:20:')['lnum'])
+    call s:assertEql(20, s:editInfoFor('/a/b/c/foo.vim:20:bar')['lnum'])
+
+    echomsg "Success"
 endfunction
