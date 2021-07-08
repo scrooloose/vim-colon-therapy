@@ -44,7 +44,7 @@ function! s:handleTrailingLineSpec(fname) abort
 
     exec "edit " . editInfo['fname']
     call s:doPostFnameCorrectionActions(a:fname)
-    call cursor(editInfo['lnum'], 1)
+    call cursor(editInfo['lnum'], editInfo['cnum'])
     normal! zz
 
     return 1
@@ -62,9 +62,13 @@ endfunction
 
 function! s:editInfoFor(fname)
     let lnum = substitute(a:fname, '^.\{-}:\(\d\+\)\(:.*\)\?$', '\1', '')
+    let cnum = substitute(a:fname, '^.\{-}:\d\+:\(\d\+\)\(:.*\)\?$', '\1', '')
+    if cnum == a:fname
+        let cnum = 1
+    endif
     let realFname = substitute(a:fname, '^\(.\{-}\):\d\+\(:.*\)\?$', '\1', '')
 
-    return { 'lnum': lnum, 'fname': realFname }
+    return { 'cnum': cnum, 'lnum': lnum, 'fname': realFname }
 endfunction
 
 " Handle filenames ending in a colon (just ignore the colon)
@@ -102,16 +106,25 @@ function! TestColonTherapyShouldMungeFileName() abort
     call s:assertEql(1, s:shouldMungeFileName('/a/b/c/foo.vim:20'))
     call s:assertEql(1, s:shouldMungeFileName('/a/b/c/foo.vim:20:'))
     call s:assertEql(1, s:shouldMungeFileName('/a/b/c/foo.vim:20:bar'))
+    call s:assertEql(1, s:shouldMungeFileName('/a/b/c/foo.vim:20:40'))
+    call s:assertEql(1, s:shouldMungeFileName('/a/b/c/foo.vim:20:40:'))
+    call s:assertEql(1, s:shouldMungeFileName('/a/b/c/foo.vim:20:40:bar'))
 endfunction
 
 function! TestColonTherapyEditInfoFor() abort
     call s:assertEql('/a/b/c/foo.vim', s:editInfoFor('/a/b/c/foo.vim:20')['fname'])
     call s:assertEql('/a/b/c/foo.vim', s:editInfoFor('/a/b/c/foo.vim:20:')['fname'])
     call s:assertEql('/a/b/c/foo.vim', s:editInfoFor('/a/b/c/foo.vim:20:bar')['fname'])
+    call s:assertEql('/a/b/c/foo.vim', s:editInfoFor('/a/b/c/foo.vim:20:40')['fname'])
+    call s:assertEql('/a/b/c/foo.vim', s:editInfoFor('/a/b/c/foo.vim:20:40:')['fname'])
+    call s:assertEql('/a/b/c/foo.vim', s:editInfoFor('/a/b/c/foo.vim:20:40:bar')['fname'])
 
     call s:assertEql(0, s:editInfoFor('/a/b/c/foo.vim')['lnum'])
     call s:assertEql(20, s:editInfoFor('/a/b/c/foo.vim:20:')['lnum'])
     call s:assertEql(20, s:editInfoFor('/a/b/c/foo.vim:20:bar')['lnum'])
+    call s:assertEql(40, s:editInfoFor('/a/b/c/foo.vim:20:40')['cnum'])
+    call s:assertEql(40, s:editInfoFor('/a/b/c/foo.vim:20:40:')['cnum'])
+    call s:assertEql(40, s:editInfoFor('/a/b/c/foo.vim:20:40:bar')['cnum'])
 
     echomsg "Success"
 endfunction
