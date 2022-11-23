@@ -23,7 +23,7 @@ function! s:ProcessTrailingLineNum()
         return
     endif
 
-    if fname =~ s:fnameMatcher
+    if fname =~# s:fnameMatcher
         let oldBufNum = bufnr()
         exec 'edit ' . s:FileNameFrom(fname)
         call cursor(s:LineNumFrom(fname), s:ColNumFrom(fname))
@@ -54,14 +54,14 @@ function! s:assertEql(this, that)
 endfunction
 
 function! s:TestFnameMatcher() abort
-    call s:assertEql(0, '/a/b/c/foo.vim' =~ s:fnameMatcher)
-    call s:assertEql(0, '/a/b/c/foo.vim:20foo' =~ s:fnameMatcher)
-    call s:assertEql(1, '/a/b/c/foo.vim:20' =~ s:fnameMatcher)
-    call s:assertEql(1, '/a/b/c/foo.vim:20:' =~ s:fnameMatcher)
-    call s:assertEql(1, '/a/b/c/foo.vim:20:bar' =~ s:fnameMatcher)
-    call s:assertEql(1, '/a/b/c/foo.vim:20:40' =~ s:fnameMatcher)
-    call s:assertEql(1, '/a/b/c/foo.vim:20:40:' =~ s:fnameMatcher)
-    call s:assertEql(1, '/a/b/c/foo.vim:20:40:bar' =~ s:fnameMatcher)
+    call s:assertEql(0, '/a/b/c/foo.vim' =~# s:fnameMatcher)
+    call s:assertEql(0, '/a/b/c/foo.vim:20foo' =~# s:fnameMatcher)
+    call s:assertEql(1, '/a/b/c/foo.vim:20' =~# s:fnameMatcher)
+    call s:assertEql(1, '/a/b/c/foo.vim:20:' =~# s:fnameMatcher)
+    call s:assertEql(1, '/a/b/c/foo.vim:20:bar' =~# s:fnameMatcher)
+    call s:assertEql(1, '/a/b/c/foo.vim:20:40' =~# s:fnameMatcher)
+    call s:assertEql(1, '/a/b/c/foo.vim:20:40:' =~# s:fnameMatcher)
+    call s:assertEql(1, '/a/b/c/foo.vim:20:40:bar' =~# s:fnameMatcher)
 endfunction
 
 function! s:TestLineNumFrom() abort
