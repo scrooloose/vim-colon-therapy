@@ -82,3 +82,10 @@ function! s:TestFileNameFrom() abort
     call s:assertEql('/a/b/c/foo.vim', s:FileNameFrom('/a/b/c/foo.vim:20:40:'))
     call s:assertEql('/a/b/c/foo.vim', s:FileNameFrom('/a/b/c/foo.vim:20:40:bar'))
 endfunction
+
+function! ColonTherapyRunTests() abort
+    call s:TestFnameMatcher()
+    call s:TestLineNumFrom()
+    call s:TestColNumFrom()
+    call s:TestFileNameFrom()
+endfunction
