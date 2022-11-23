@@ -18,16 +18,16 @@ augroup colontherapy
     autocmd bufnewfile,bufenter * ++nested call s:ProcessTrailingLineNum()
 augroup END
 function! s:ProcessTrailingLineNum()
-    let fname = expand("%")
+    let fname = expand('%')
     if filereadable(fname)
         return
     endif
 
     if fname =~ s:fnameMatcher
         let oldBufNum = bufnr()
-        exec "edit " . s:FileNameFrom(fname)
+        exec 'edit ' . s:FileNameFrom(fname)
         call cursor(s:LineNumFrom(fname), s:ColNumFrom(fname))
-        exec ":bwipe " . oldBufNum
+        exec ':bwipe ' . oldBufNum
     endif
 endfunction
 
@@ -49,7 +49,7 @@ endfunction
 
 function! s:assertEql(this, that)
     if a:this != a:that
-        throw "Not equal: " . a:this . " " . a:that
+        throw 'Not equal: ' . a:this . ' ' . a:that
     endif
 endfunction
 
