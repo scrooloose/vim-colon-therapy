@@ -13,7 +13,10 @@ let g:loaded_colon_therapy = 1
 
 let s:fnameMatcher = ':\d\+\(:.*\)\?$'
 
-autocmd bufnewfile,bufenter * ++nested call s:ProcessTrailingLineNum()
+augroup colontherapy
+    autocmd!
+    autocmd bufnewfile,bufenter * ++nested call s:ProcessTrailingLineNum()
+augroup END
 function! s:ProcessTrailingLineNum()
     let fname = expand("%")
     if filereadable(fname)
