@@ -7,7 +7,7 @@
 "              See http://sam.zoy.org/wtfpl/COPYING for more details.
 " ============================================================================
 if exists('g:loaded_colon_therapy')
-    exit
+    finish
 endif
 let g:loaded_colon_therapy = 1
 
@@ -21,8 +21,10 @@ function! s:ProcessTrailingLineNum()
     endif
 
     if fname =~ s:fnameMatcher
+        let oldBufNum = bufnr()
         exec "edit " . s:FileNameFrom(fname)
         exec s:LineNumFrom(fname)
+        exec ":bwipe " . oldBufNum
     endif
 endfunction
 
