@@ -60,8 +60,9 @@ result in the following:
 I would then have to strip off the `:39:7:`.
 
 Enter Colon Therapy! With this plugin, Vim will edit the file and jump to line
-39. Everything after the first colon is treated as a line number. The rest is
-ignored.
+39, column 7. A number after the first colon is treated as a line number.
+Optionally, if there's a column number, Vim will jump to that column number.
+The rest is ignored.
 
 If there is only a colon, then this will simply be chopped off and ignored.
 
@@ -78,12 +79,14 @@ Plugin 'scrooloose/vim-colon-therapy'
 
 # Usage
 
-Edit a filename with a trailing colon and line number. One of these forms:
+Edit a filename with a trailing colon and line number (optionally col number).
+One of these forms:
 
 ```
-:e [file]:[line num]               => edits [file], jumps to [line num]
-:e [file]:[line num]:[other junk]  => edits [file], jumps to [line num], ignores [other junk]
-:e [file]:                         => edits [file], ignores colon
+:e [file]:[line num]                         => edits [file], jumps to [line num]
+:e [file]:[line num]:[col num]:[other junk]  => edits [file], jumps to [line num][col num], ignores [other junk]
+:e [file]:[line num]:[other junk]            => edits [file], jumps to [line num], ignores [other junk]
+:e [file]:                                   => edits [file], ignores colon
 ```
 
 These are the forms I encounter regularly, but there may be more.
