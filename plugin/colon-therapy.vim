@@ -25,6 +25,7 @@ function! s:ProcessTrailingLineNum()
 
     if fname =~# s:fnameMatcher
         let oldBufNum = bufnr()
+        exec "normal! \<c-o>"
         exec 'edit ' . s:FileNameFrom(fname)
         call cursor(s:LineNumFrom(fname), s:ColNumFrom(fname))
         exec ':bwipe ' . oldBufNum
